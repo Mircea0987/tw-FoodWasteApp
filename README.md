@@ -100,3 +100,48 @@ Proiectul este dezvoltat de o echipă de **3 membri**, fiecare responsabil de o 
 
 ---
 
+# Instalare
+
+1. Clonează repository-ul:
+
+```bash
+
+git clone <URL_REPO>
+cd proiectWeb/backend
+
+```
+Instalează dependențele:
+
+npm install
+npm install sequelize pg pg-hstore
+npm install express
+npm install body-parser
+
+Configurare bază de date
+
+Editează fișierul database/sequelize.js pentru a potrivi datele tale PostgreSQL:
+
+const { Sequelize } = require("sequelize");
+
+const sequelize = new Sequelize(
+  "wb-project", // numele bazei de date
+  "postgres",   // username
+  "admin",      // parola
+  {
+    host: "localhost",
+    dialect: "postgres",
+  }
+);
+
+module.exports = sequelize;
+
+
+Modifică database, username și password conform setup-ului tău.
+
+Rularea serverului
+
+node app.js
+
+Sync bazei de date
+
+http://localhost:8001/create
