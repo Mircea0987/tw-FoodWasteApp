@@ -19,8 +19,8 @@ Back-end-ul este dezvoltat folosind **Node.js** ca mediu de rulare, datorită pe
   - gestionarea erorilor
 - Organizarea logicii aplicației în **controllere** și **servicii**, pentru o separare clară a responsabilităților.
 
-### 📦 Prisma ORM
-Pentru interacțiunea cu baza de date relațională **PostgreSQL**, se folosește **Prisma ORM**, care oferă:
+### 📦 Sequelize ORM
+Pentru interacțiunea cu baza de date relațională **PostgreSQL**, se folosește **Sequelize ORM**, care oferă:
 - client tipizat generat automat
 - operațiuni CRUD simplificate
 - gestionarea facilă a relațiilor dintre entități
@@ -36,7 +36,7 @@ Pentru interacțiunea cu baza de date relațională **PostgreSQL**, se foloseșt
 
 ## 🗄️ Modelarea Bazei de Date (DB Layer)
 
-Aplicația folosește **PostgreSQL**, ales pentru suportul pentru relații complexe, tranzacții ACID și scalabilitate. Accesul la date este realizat prin **ORM modern** (Prisma/Sequelize), integrat în back-end-ul Node.js/Express.
+Aplicația folosește **PostgreSQL**, ales pentru suportul pentru relații complexe, tranzacții ACID și scalabilitate. Accesul la date este realizat prin **ORM modern** (Sequelize), integrat în back-end-ul Node.js/Express.
 
 ### 📑 Entitățile principale:
 - **Utilizatori** – profilul utilizatorilor aplicației
@@ -73,7 +73,7 @@ Proiectul este dezvoltat de o echipă de **3 membri**, fiecare responsabil de o 
 
 | Membru | Rol | Responsabilități principale |
 |--------|-----|----------------------------|
-| Calugaru Mircea-Costin | Back-end (Server) | Dezvoltarea API-ului RESTful folosind Node.js și Express.js, integrarea cu PostgreSQL prin Prisma, definirea rutelor, middleware-urilor și logicii serverului |
+| Calugaru Mircea-Costin | Back-end (Server) | Dezvoltarea API-ului RESTful folosind Node.js și Express.js, integrarea cu PostgreSQL prin Sequelize, definirea rutelor, middleware-urilor și logicii serverului |
 | Cernea Costin-Matei | Front-end (Client Web) | Dezvoltarea interfeței SPA folosind React.js și Bootstrap, consumarea endpoint-urilor REST, gestionarea logicii de interacțiune și afișarea datelor JSON |
 | Cibotar Calin | Baza de Date & Web Layer | Modelarea bazei de date PostgreSQL, definirea entităților și relațiilor, integrarea cu ORM-ul utilizat, suport back-end pentru interogări și validări |
 
