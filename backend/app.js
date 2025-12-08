@@ -3,7 +3,10 @@ const express = require("express");
 const bodyParser = require('body-parser')
 const sequelize = require("./database/sequelize");
 const errorHandler = require("./middleware/errorHandler");
-const PORT_NUMBER = 8001;
+require('dotenv').config()
+
+//console.log(process.env.JWT_PASS);
+
 
 //Models
 const Category = require("./models/Category");
@@ -66,7 +69,7 @@ app.use(errorHandler);
 
 //Start the server on port 8001
 
-app.listen((PORT_NUMBER),()=>{
-    console.log(`The server is running... on port ${PORT_NUMBER}`);
+app.listen((process.env.PORT_NUMBER),()=>{
+    console.log(`The server is running... on port ${process.env.PORT_NUMBER}`);
     
 })
