@@ -105,6 +105,7 @@ git clone <URL_REPO>
 cd proiectWeb/ # Navigare în directorul principal
 
 # 2. Instalare dependențe Backend (in root directory)
+cd backend/
 npm install
 
 # 3. Instalare dependențe Frontend
@@ -112,7 +113,7 @@ cd ../frontend
 npm install
 
 # 4. Start
-cd ..
+cd backend
 npm run dev
 
 cd proiectWeb/frontend 
