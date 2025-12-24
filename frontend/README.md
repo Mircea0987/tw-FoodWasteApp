@@ -31,5 +31,6 @@ Aplicația rulează momentan cu date simulate (Mock Data & LocalStorage) pentru 
 * **Frigiderul Meu:** Vizualizarea produselor proprii cu alerte vizuale de expirare.
 * **Adăugare Produs:** Formular funcțional pentru introducerea alimentelor în lista personală.
 * **Sistem de Share (Partajare):** Posibilitatea de a marca un produs propriu ca fiind "La comun". Acesta devine vizibil automat în Marketplace.
-* **Marketplace:** Lista produselor disponibile oferite de alți utilizatori.
+* **Marketplace avansat:** Lista produselor disponibile de la alți utilizatori, cu opțiuni de filtrare după categorie și sortare după data expirării (Urgent vs. Târziu).
 * **Claim System:** Posibilitatea de a revendica un produs din piață (acesta dispare din lista comună și, opțional, este transferat utilizatorului curent).
+* **UI/UX:** Interfață responsivă, footer informativ.

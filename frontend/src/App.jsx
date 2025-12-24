@@ -6,7 +6,8 @@ import MyFridge from './pages/MyFridge';
 import AddProduct from './pages/AddProduct';
 import Marketplace from './pages/Marketplace';
 import Login from './pages/Login';
-import Register from './pages/Register'; 
+import Register from './pages/Register';
+import Footer from './components/Footer';
 
 import { Container } from 'react-bootstrap';
 
@@ -25,9 +26,11 @@ function App() {
   }, [navigate]);
 
   return (
-    <>
+    <div className="d-flex flex-column min-vh-100">
+      
       <MyNavbar />
-      <Container>
+    
+      <Container className="flex-grow-1 mt-3">
         <Routes>
           {/* RUTELE DE AUTH */}
           <Route path="/login" element={<Login />} />
@@ -39,7 +42,10 @@ function App() {
           <Route path="/add-product" element={<AddProduct />} />
         </Routes>
       </Container>
-    </>
+
+      <Footer />
+      
+    </div>
   );
 }
 

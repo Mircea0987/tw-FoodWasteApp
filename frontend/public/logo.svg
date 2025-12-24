@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <title>Icoana Food Waste - Cotor de Măr</title>
+
+  <path d="M64 10 Q68 5 74 8" stroke="#795548" stroke-width="4" fill="none" stroke-linecap="round"/>
+  
+  <path d="M64 10 Q85 0 85 15 Q75 25 64 15 Z" fill="#66BB6A"/>
+
+  <path d="M40 35 Q64 25 88 35 Q88 45 80 50 Q64 45 48 50 Q40 45 40 35 Z" fill="#EF5350"/>
+
+  <path d="M48 50 Q55 64 48 78 L44 95 Q64 90 84 95 L80 78 Q73 64 80 50 Q64 45 48 50 Z" fill="#FFF9C4"/>
+
+  <path d="M44 95 Q64 90 84 95 Q80 105 64 108 Q48 105 44 95 Z" fill="#EF5350"/>
+
+  <ellipse cx="60" cy="64" rx="2" ry="4" fill="#3E2723" transform="rotate(-15 60 64)"/>
+  <ellipse cx="68" cy="64" rx="2" ry="4" fill="#3E2723" transform="rotate(15 68 64)"/>
+</svg>
