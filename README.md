@@ -104,8 +104,7 @@ Proiectul este dezvoltat de o echipă de **3 membri**, fiecare responsabil de o 
 git clone <URL_REPO>
 cd proiectWeb/ # Navigare în directorul principal
 
-# 2. Instalare dependențe Backend
-cd backend
+# 2. Instalare dependențe Backend (in root directory)
 npm install
 
 # 3. Instalare dependențe Frontend
@@ -113,7 +112,7 @@ cd ../frontend
 npm install
 
 # 4. Start
-cd ../backend 
+cd ..
 npm run dev
 
 cd proiectWeb/frontend 
