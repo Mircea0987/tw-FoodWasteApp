@@ -1,9 +1,9 @@
 //Utils
+require('dotenv').config();
 const express = require("express");
 const bodyParser = require('body-parser')
 const sequelize = require("./database/sequelize");
 const errorHandler = require("./middleware/errorHandler");
-require('dotenv').config()
 
 //console.log(process.env.JWT_PASS);
 
