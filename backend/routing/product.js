@@ -1,126 +1,137 @@
 const express = require("express");
-const Product = require('../models/Product');
-const User = require('../models/User');
 const router = express.Router();
-const { authenticateToken } = require('../middleware/auth');
 
-router.route("/products")
-    .get(async (req, res) => {
-        try {
-            const products = await Product.findAll();
-            if (products.length > 0) {
-                res.status(200).json(products);
-            } else {
-                res.status(404).json({ msg: "No products found!" });
-            }
-        } catch (err) {
-            res.status(500).json({ error: err.message });
-        }
-    })
-    .post(async (req, res) => {
-        try {
-            const newProduct = await Product.create(req.body);
-            res.status(201).json({ msg: "Product created!", product: newProduct });
-        } catch (err) {
-            console.error(err);
-            res.status(500).json({ error: err.message });
-        }
+const Product = require("../models/Product");
+const ProductList = require("../models/ProductList");
+const Category = require("../models/Category");
+
+const { authenticateToken } = require("../middleware/auth");
+
+router.get("/products", authenticateToken, async (req, res) => {
+  try {
+    const fridge = await ProductList.findOne({ where: { UserID: req.user.id } });
+    if (!fridge) return res.status(400).json({ message: "Nu ai frigider." });
+
+    const products = await Product.findAll({ where: { ListID: fridge.ListID } });
+    res.status(200).json(products);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.get("/marketplace", authenticateToken, async (req, res) => {
+  try {
+    const products = await Product.findAll({ where: { Status: "MARKETPLACE" } });
+    res.status(200).json(products);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.post("/products", authenticateToken, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const fridge = await ProductList.findOne({ where: { UserID: userId } });
+    if (!fridge) return res.status(400).json({ message: "Nu ai frigider asociat." });
+
+    const { ProductName, CategoryID, CategoryName, Status, ExpirationDate, Description } = req.body;
+    if (!ProductName || !CategoryID) return res.status(400).json({ message: "ProductName și CategoryID sunt obligatorii." });
+
+    const [category] = await Category.findOrCreate({
+      where: { CategoryID },
+      defaults: { CategoryName }
     });
 
-router.route("/products/:productID")
-    .put(async (req, res) => {
-        try {
-            const product = await Product.findByPk(req.params.productID);
-            if (product) {
-                await product.update(req.body);
-                res.status(200).json({ msg: `Product ${req.params.productID} updated!` });
-            } else {
-                res.status(404).json({ msg: "Product not found!" });
-            }
-        } catch (err) {
-            res.status(500).json({ error: err.message });
-        }
-    })
-    .delete(async (req, res) => {
-        try {
-            const product = await Product.findByPk(req.params.productID);
-            if (product) {
-                await product.destroy();
-                res.status(200).json({ msg: `Product ${req.params.productID} deleted!` });
-            } else {
-                res.status(404).json({ msg: "Product not found!" });
-            }
-        } catch (err) {
-            res.status(500).json({ error: err.message });
-        }
+    const product = await Product.create({
+      ProductName,
+      CategoryID: category.CategoryID,
+      Status: Status,
+      ExpirationDate,
+      Description,
+      ListID: fridge.ListID
     });
 
-router.put('/share/:id', authenticateToken, async (req, res) => { 
-    try {
-        const productId = req.params.id;
-        const userId = req.user.id; 
-
-        const user = await User.findByPk(userId);
-        if (!user || !user.ListID) {
-            return res.status(400).json({ message: "Nu ai un frigider asociat pentru a putea partaja produse." });
-        }
-
-        const product = await Product.findOne({ 
-            where: { 
-                ProductID: productId, 
-                ListID: user.ListID 
-            } 
-        });
-
-        if (!product) {
-            return res.status(404).json({ message: "Produsul nu a fost găsit sau nu îți aparține." });
-        }
-
-        if (product.Status === 'MARKETPLACE') {
-             return res.status(400).json({ message: "Produsul este deja în Marketplace." });
-        }
-
-        product.Status = 'MARKETPLACE';
-        await product.save();
-
-        res.json({ message: "Produsul a fost adăugat în Marketplace!", product });
-
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
+    res.status(201).json({ message: "Produs adăugat în frigider!", product });
+  } catch (err) {
+    console.error("ADD PRODUCT ERROR:", err);
+    res.status(500).json({ error: err.message });
+  }
 });
-router.put('/claim/:id', authenticateToken, async (req, res) => { 
-    try {
-        const productId = req.params.id;
-        const buyerId = req.user.id; 
 
-        const buyer = await User.findByPk(buyerId);
-        if (!buyer) return res.status(404).json({ message: "User not found" });
 
-        if (!buyer.ListID) {
-            return res.status(400).json({ message: "Nu ai un frigider (ListID) asociat." });
-        }
+router.put("/products/:productID", authenticateToken, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const productId = req.params.productID;
+    const fridge = await ProductList.findOne({ where: { UserID: userId } });
+    if (!fridge) return res.status(403).json({ message: "Nu ai frigider." });
 
-        const product = await Product.findOne({ 
-            where: { 
-                ProductID: productId, 
-                Status: 'MARKETPLACE' 
-            } 
-        });
+    const product = await Product.findOne({ where: { ProductID: productId, ListID: fridge.ListID } });
+    if (!product) return res.status(404).json({ message: "Produsul nu există sau nu îți aparține." });
 
-        if (!product) {
-            return res.status(404).json({ message: "Produsul nu este disponibil sau a fost deja luat." });
-        }
-
-        product.ListID = buyer.ListID; 
-        product.Status = 'FRIDGE'; 
-
-        await product.save();
-
-        res.json({ message: "Produsul este acum în frigiderul tău!", product });
-
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
+    await product.update(req.body);
+    res.json({ message: "Produs actualizat!", product });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
+
+
+router.delete("/products/:productID", authenticateToken, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const productId = req.params.productID;
+    const fridge = await ProductList.findOne({ where: { UserID: userId } });
+    if (!fridge) return res.status(403).json({ message: "Nu ai frigider." });
+
+    const product = await Product.findOne({ where: { ProductID: productId, ListID: fridge.ListID } });
+    if (!product) return res.status(404).json({ message: "Produsul nu a fost găsit sau nu îți aparține." });
+
+    await product.destroy();
+    res.json({ message: "Produs șters cu succes!" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.put("/products/share/:id", authenticateToken, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const productId = req.params.id;
+    const fridge = await ProductList.findOne({ where: { UserID: userId } });
+    if (!fridge) return res.status(400).json({ message: "Nu ai frigider." });
+
+    const product = await Product.findOne({ where: { ProductID: productId, ListID: fridge.ListID } });
+    if (!product) return res.status(404).json({ message: "Produsul nu îți aparține." });
+    if (product.Status === "MARKETPLACE") return res.status(400).json({ message: "Produsul este deja în Marketplace." });
+
+    product.Status = "MARKETPLACE";
+    await product.save();
+
+    res.json({ message: "Produsul a fost mutat în Marketplace.", product });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.put("/products/claim/:id", authenticateToken, async (req, res) => {
+  try {
+    const buyerId = req.user.id;
+    const productId = req.params.id;
+    const fridge = await ProductList.findOne({ where: { UserID: buyerId } });
+    if (!fridge) return res.status(400).json({ message: "Nu ai frigider asociat." });
+
+    const product = await Product.findOne({ where: { ProductID: productId, Status: "MARKETPLACE" } });
+    if (!product) return res.status(404).json({ message: "Produs indisponibil." });
+
+    product.ListID = fridge.ListID; 
+    product.Status = "FRIDGE";
+    await product.save();
+
+    res.json({ message: "Produsul este acum în frigiderul tău!", product });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 module.exports = router;

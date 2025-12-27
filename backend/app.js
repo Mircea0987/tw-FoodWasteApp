@@ -41,13 +41,18 @@ Product.belongsTo(Category);
 
 //1-M between Products and ProductList
 
-Product.hasMany(ProductList);
-ProductList.belongsTo(Product);
+ProductList.hasMany(Product, { foreignKey: 'ListID' });
+Product.belongsTo(ProductList, { foreignKey: 'ListID' });
 
 //1-1 between ProductList and User
+User.hasOne(ProductList, {
+  foreignKey: 'UserID',
+  onDelete: 'CASCADE'
+});
 
-User.hasOne(ProductList);
-ProductList.belongsTo(User);
+ProductList.belongsTo(User, {
+  foreignKey: 'UserID'
+});
 
 //Using middlewares
 
@@ -59,7 +64,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use("/api",mainRouter);
 
-//Set up the routings
 
 app.get("/create", async (req, res,next) => {
   try {
