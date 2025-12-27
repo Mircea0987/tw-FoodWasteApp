@@ -62,30 +62,13 @@ export const addProduct = async (productData) => {
 
 // --- 3. ACTIUNI (SHARE & CLAIM)
 
-export const shareProduct = async (productId) => {
-  try {
-    const response = await apiClient.put(`/product/products/${productId}`, {
-      Status: 'public' 
-    });
-    return { success: true, data: response.data };
-  } catch (error) {
-    console.error("Eroare la shareProduct:", error);
-    throw error;
-  }
+export const shareProduct = async (id) => {
+  return await apiClient.put(`/product/share/${id}`);
 };
 
-export const claimProduct = async (productId) => {
-  try {
-    await apiClient.delete(`/product/products/${productId}`);
-    return { success: true };
-  } catch (error) {
-    console.error("Eroare la claimProduct:", error);
-    throw error;
-  }
+export const claimProduct = async (id) => {
+  return await apiClient.put(`/product/claim/${id}`);
 };
-
-// !!! Pentru backend : ar trebui sa aiba rutele DELETE
-// /api/product/products/:id si PUT /api/product/products/:id active.
 
 
 // Sterge produs
@@ -97,8 +80,8 @@ export const deleteProduct = async (productId) => {
 
 // Actualizare produs
 
-export const updateProduct = async (productId, updateDate) => {
-  return await apiClient.put(`/product/products/${productId}`, updateDate);
+export const updateProduct = async (id, productData) => {
+  return await apiClient.put(`/product/products/${id}`, productData);
 }
 
 // --- 4. AUTH ---

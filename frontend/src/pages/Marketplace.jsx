@@ -26,12 +26,12 @@ const Marketplace = () => {
       const response = await getMarketplaceItems();
       const rawData = Array.isArray(response.data) ? response.data : [];
 
-      const publicItems = rawData.filter(item => item.Status === 'public');
+      const publicItems = rawData.filter(item => item.Status === 'MARKETPLACE' || item.Status === 'public');
 
       const adaptedItems = publicItems.map(dbItem => {
-        let cleanCategory = 'Altele';
-        if (dbItem.Description && dbItem.Description.includes('Categorie selectată: ')) {
-            cleanCategory = dbItem.Description.replace('Categorie selectată: ', '').trim();
+        let cleanCategory = dbItem.Description || 'Altele';
+        if (cleanCategory.includes('Categorie selectată: ')) {
+            cleanCategory = cleanCategory.replace('Categorie selectată: ', '').trim();
         }
 
         return {
@@ -39,8 +39,9 @@ const Marketplace = () => {
             name: dbItem.ProductName,       
             expirationDate: dbItem.ExpirationDate, 
             category: cleanCategory,        
+            // Va scrie "Vecinul Tau" pana cand primestem numele real din backend
             owner: 'Vecinul Tău',           
-            image: `https://placehold.co/100?text=${dbItem.ProductName.substring(0,3)}` 
+            image: `https://placehold.co/100?text=${dbItem.ProductName ? dbItem.ProductName.substring(0,3) : 'H'}` 
         };
       });
 
@@ -82,6 +83,16 @@ const Marketplace = () => {
   const formatDate = (dateString) => {
     if (!dateString) return 'N/A';
     return new Date(dateString).toLocaleDateString('ro-RO');
+  };
+
+  // Helper pentru a vedea daca expira in curand (3 zile)
+  const isExpiringSoon = (dateString) => {
+      if(!dateString) return false;
+      const today = new Date();
+      const expDate = new Date(dateString);
+      const diffTime = expDate - today;
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+      return diffDays <= 3;
   };
 
   // --- LOGICA (useMemo) --- 
@@ -173,9 +184,9 @@ const Marketplace = () => {
                     />
                     <div>
                       <Card.Title className="mb-0">{item.name}</Card.Title>
-                      <small className={
-                        new Date(item.expirationDate) < new Date('2026-01-01') ? "text-danger fw-bold" : "text-muted"
-                      }>
+                      
+                      {/* Logica dinamica pentru data */}
+                      <small className={isExpiringSoon(item.expirationDate) ? "text-danger fw-bold" : "text-muted"}>
                         Expiră: {formatDate(item.expirationDate)}
                       </small>
                     </div>

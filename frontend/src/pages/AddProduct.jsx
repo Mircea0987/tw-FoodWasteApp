@@ -21,12 +21,15 @@ const AddProduct = () => {
 
     
     const myListId = localStorage.getItem("list_id");
+
+    const finalListID = myListId ? parseInt(myListId) : 1;
     
-    if(!myListId) {
+    /*if(!myListId) {
       alert("Eroare: Nu s-a găsit lista ta personală. Te rugăm să te autentifici din nou.");
       setLoading(false);
       return;
     }
+    */
 
     setLoading(true);
 
@@ -35,7 +38,8 @@ const AddProduct = () => {
       ExpirationDate: date,
       
       CategoryID: 1, // Salvam cu ID generic 1 pentru toate categoriile momentan
-      ListID: parseInt(myListId),
+      //ListID: parseInt(myListId),
+      ListID: finalListID,
       Status: 'private',
       Description: category
     };
