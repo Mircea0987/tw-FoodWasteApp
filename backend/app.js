@@ -1,12 +1,14 @@
 //Utils
-require('dotenv').config();
 const express = require("express");
 const bodyParser = require('body-parser')
 const sequelize = require("./database/sequelize");
 const errorHandler = require("./middleware/errorHandler");
 
-//console.log(process.env.JWT_PASS);
+const cors = require('cors'); // Implementat de Costin (CORS)
 
+require('dotenv').config()
+
+//console.log(process.env.JWT_PASS);
 
 
 //Models
@@ -49,6 +51,7 @@ ProductList.belongsTo(User);
 //Using middlewares
 
 const app = express();
+app.use(cors()); // Implementat de Costin (CORS)
 
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));

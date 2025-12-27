@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Container, Form, Button, Card, Alert, Spinner } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
@@ -7,7 +6,7 @@ import { addProduct } from '../services/api';
 const AddProduct = () => {
   const navigate = useNavigate();
   
-  // Stari pentru datele formularului
+  // Stari pentru datele formularului (UI)
   const [name, setName] = useState('');
   const [category, setCategory] = useState('Lactate');
   const [date, setDate] = useState('');
@@ -19,23 +18,33 @@ const AddProduct = () => {
     e.preventDefault();
     setLoading(true);
 
-    // 1. Pregatim datele
-    const productData = {
-      name: name,
-      category: category,
-      expirationDate: date
+    
+    const productPayload = {
+      ProductName: name,         
+      ExpirationDate: date,      
+      
+      CategoryID: 1,             
+      ListID: 1,                 
+      
+      Status: 'private',         
+      Description: `Categorie selectată: ${category}` 
     };
 
-    // 2. Le trimitem la "serverul fals" (api.js)
-    await addProduct(productData);
+    try {
+      await addProduct(productPayload);
 
-    // 3. Afisam succes si redirectionam
-    setLoading(false);
-    setShowSuccess(true);
-    
-    setTimeout(() => {
-      navigate('/'); // Ne intoarcem la frigider sa vedem produsul
-    }, 1500);
+      setLoading(false);
+      setShowSuccess(true);
+      
+      setTimeout(() => {
+        navigate('/'); // Ne intoarcem la frigider sa vedem produsul
+      }, 1500);
+
+    } catch (error) {
+      console.error("Eroare la salvare:", error);
+      setLoading(false);
+      alert("Eroare la salvare! Verifică în consolă dacă ai erori de Foreign Key (CategoryID/ListID).");
+    }
   };
 
   return (
@@ -48,7 +57,7 @@ const AddProduct = () => {
         <Card.Body>
           <Form onSubmit={handleSubmit}>
             
-            {/* NUME */}
+            {/* NUME PRODUS */}
             <Form.Group className="mb-3">
               <Form.Label>Nume Produs</Form.Label>
               <Form.Control 
@@ -60,7 +69,7 @@ const AddProduct = () => {
               />
             </Form.Group>
 
-            {/* CATEGORIE */}
+            {/* CATEGORIE (Doar vizual momentan, se salveaza in Descriere) */}
             <Form.Group className="mb-3">
               <Form.Label>Categorie</Form.Label>
               <Form.Select 
@@ -72,7 +81,11 @@ const AddProduct = () => {
                 <option>Legume</option>
                 <option>Carne</option>
                 <option>Conserve</option>
+                <option>Altele</option>
               </Form.Select>
+              <Form.Text className="text-muted">
+                *Momentan se va salva intern cu ID-ul generic 1.
+              </Form.Text>
             </Form.Group>
 
             {/* DATA EXPIRARII */}

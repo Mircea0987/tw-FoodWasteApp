@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { getMarketplaceItems, claimProduct } from '../services/api';
-import { Container, Row, Col, Card, Button, Badge, Alert, Spinner, Form } from 'react-bootstrap';
+import { Container, Row, Col, Card, Button, Badge, Alert, Spinner, Form, Modal } from 'react-bootstrap';
 
 const Marketplace = () => {
   const [items, setItems] = useState([]);
@@ -11,48 +11,92 @@ const Marketplace = () => {
   const [selectedCategory, setSelectedCategory] = useState('Toate');
   const [sortOption, setSortOption] = useState('date_asc'); 
 
+  const [showModal, setShowModal] = useState(false);
+  const [productToClaim, setProductToClaim] = useState(null); // Stocam produsul pe care vrei sa il iei
+
   const CATEGORIES = ['Toate', 'Lactate', 'Fructe', 'Legume', 'Carne', 'Conserve', 'Altele'];
 
-  // Incarcarea datelor
   useEffect(() => {
     loadData();
   }, []);
 
-  const loadData = () => {
+  const loadData = async () => {
     setLoading(true);
-    getMarketplaceItems().then((res) => {
-      setItems(res.data);
+    try {
+      const response = await getMarketplaceItems();
+      const rawData = Array.isArray(response.data) ? response.data : [];
+
+      const publicItems = rawData.filter(item => item.Status === 'public');
+
+      const adaptedItems = publicItems.map(dbItem => {
+        let cleanCategory = 'Altele';
+        if (dbItem.Description && dbItem.Description.includes('Categorie selectată: ')) {
+            cleanCategory = dbItem.Description.replace('Categorie selectată: ', '').trim();
+        }
+
+        return {
+            id: dbItem.ProductID,           
+            name: dbItem.ProductName,       
+            expirationDate: dbItem.ExpirationDate, 
+            category: cleanCategory,        
+            owner: 'Vecinul Tău',           
+            image: `https://placehold.co/100?text=${dbItem.ProductName.substring(0,3)}` 
+        };
+      });
+
+      setItems(adaptedItems);
+    } catch (error) {
+      console.error("Eroare incarcare marketplace:", error);
+    } finally {
       setLoading(false);
-    });
+    }
   };
 
-  const handleClaim = async (id, name) => {
-    await claimProduct(id);
-    setMessage(`Ai revendicat cu succes: ${name}! 😋`);
-    loadData();
-    setTimeout(() => setMessage(''), 3000);
+  // 1. Cand apesi butonul, doar DESCHIDEM fereastra (nu stergem inca)
+  const handleClaimClick = (item) => {
+    setProductToClaim(item);
+    setShowModal(true);
   };
 
-  // --- LOGICA (useMemo) ---
+  // 2. Asta se intampla cand apesi "DA" in fereastra
+  const confirmClaim = async () => {
+    if (!productToClaim) return;
+
+    try {
+        await claimProduct(productToClaim.id); 
+        setMessage(`Ai revendicat cu succes: ${productToClaim.name}! 😋`);
+        
+        // Inchidem modala si reincarcam datele
+        setShowModal(false);
+        setProductToClaim(null);
+        loadData(); 
+
+        setTimeout(() => setMessage(''), 3000);
+    } catch (err) {
+        alert("Eroare la revendicare. Încearcă din nou.");
+        setShowModal(false);
+    }
+  };
+
+  // Helper formatare data
+  const formatDate = (dateString) => {
+    if (!dateString) return 'N/A';
+    return new Date(dateString).toLocaleDateString('ro-RO');
+  };
+
+  // --- LOGICA (useMemo) --- 
   const processedItems = useMemo(() => {
     let result = [...items]; 
-
-    // 1. Filtrare
     if (selectedCategory !== 'Toate') {
       result = result.filter(item => item.category === selectedCategory);
     }
-
-    // 2. Sortare
     result.sort((a, b) => {
-      if (sortOption === 'date_asc') {
-        return new Date(a.expirationDate) - new Date(b.expirationDate);
-      }
-      if (sortOption === 'date_desc') {
-        return new Date(b.expirationDate) - new Date(a.expirationDate);
-      }
+      const dateA = new Date(a.expirationDate);
+      const dateB = new Date(b.expirationDate);
+      if (sortOption === 'date_asc') return dateA - dateB;
+      if (sortOption === 'date_desc') return dateB - dateA;
       return 0;
     });
-
     return result;
   }, [items, selectedCategory, sortOption]);
 
@@ -70,8 +114,6 @@ const Marketplace = () => {
       {/* --- ZONA FILTRE --- */}
       <Card className="p-3 mb-4 bg-light border-0">
         <Row className="g-3 align-items-center">
-          
-        
           <Col md={8}>
             <span className="fw-bold me-2">Categorie:</span>
             <div className="d-inline-flex gap-2 flex-wrap">
@@ -88,8 +130,6 @@ const Marketplace = () => {
               ))}
             </div>
           </Col>
-
-          {/* Sortare */}
           <Col md={4}>
              <Form.Group className="d-flex align-items-center justify-content-md-end">
                <Form.Label className="me-2 mb-0 fw-bold text-nowrap">Sortează:</Form.Label>
@@ -109,8 +149,7 @@ const Marketplace = () => {
       {/* --- LISTA PRODUSE --- */}
       {processedItems.length === 0 ? (
         <Alert variant="info">
-            Nu există produse în categoria <strong>{selectedCategory}</strong> momentan. 
-            {selectedCategory !== 'Toate' && " Încearcă să selectezi 'Toate'."}
+            Nu există produse disponibile momentan. Mergi la "Frigiderul Meu" și pune ceva la comun! ♻️
         </Alert>
       ) : (
         <Row>
@@ -125,7 +164,7 @@ const Marketplace = () => {
                 <Card.Body>
                   <div className="d-flex align-items-center mb-3">
                     <img 
-                      src={item.image || "https://placehold.co/50"} 
+                      src={item.image} 
                       alt={item.name} 
                       className="rounded-circle me-3" 
                       width="50" 
@@ -137,22 +176,20 @@ const Marketplace = () => {
                       <small className={
                         new Date(item.expirationDate) < new Date('2026-01-01') ? "text-danger fw-bold" : "text-muted"
                       }>
-                        Expiră: {item.expirationDate}
+                        Expiră: {formatDate(item.expirationDate)}
                       </small>
                     </div>
                   </div>
-                  <Card.Text>
-                    {item.owner} oferă acest produs gratuit. Îl dorești?
-                  </Card.Text>
+                  <Card.Text>Produs disponibil gratuit. Îl dorești?</Card.Text>
                 </Card.Body>
 
                 <Card.Footer className="bg-white border-top-0">
                   <Button 
                     variant="success" 
                     className="w-100 fw-bold"
-                    onClick={() => handleClaim(item.id, item.name)}
+                    onClick={() => handleClaimClick(item)}
                   >
-                    🙋‍♂️ Vreau eu! (Claim)
+                    🙋‍♂️ Vreau eu! (Revendică)
                   </Button>
                 </Card.Footer>
               </Card>
@@ -160,6 +197,27 @@ const Marketplace = () => {
           ))}
         </Row>
       )}
+
+      <Modal show={showModal} onHide={() => setShowModal(false)} centered>
+        <Modal.Header closeButton className="bg-light">
+          <Modal.Title>Confirmare Revendicare</Modal.Title>
+        </Modal.Header>
+        <Modal.Body className="text-center py-4">
+          <div style={{ fontSize: '3rem', marginBottom: '10px' }}>🍽️</div>
+          <h5>Ești sigur că vrei să iei produsul:</h5>
+          <h3 className="text-primary my-3">{productToClaim?.name}</h3>
+          <p className="text-muted">Acesta va dispărea din Marketplace și va fi alocat ție.</p>
+        </Modal.Body>
+        <Modal.Footer className="justify-content-center border-0 pb-4">
+          <Button variant="outline-secondary" onClick={() => setShowModal(false)} className="px-4">
+            Nu, m-am răzgândit
+          </Button>
+          <Button variant="success" onClick={confirmClaim} className="px-4 fw-bold">
+            Da, mi-e foame!
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
     </Container>
   );
 };

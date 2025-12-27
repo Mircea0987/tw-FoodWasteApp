@@ -1,6 +1,5 @@
-
 import React, { useState } from 'react';
-import { Container, Form, Button, Card, Alert } from 'react-bootstrap';
+import { Container, Form, Button, Card, Alert, Spinner } from 'react-bootstrap';
 import { useNavigate, Link } from 'react-router-dom';
 import { loginUser } from '../services/api'; 
 
@@ -9,26 +8,24 @@ const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setLoading(true);
 
     try {
-      
-      const response = await loginUser(email, password);
-      
-      
-      localStorage.setItem('token', response.token); 
-      localStorage.setItem('user_name', response.user.name);
-      localStorage.setItem('user_id', response.user.id);
-
+      await loginUser(email, password);
       
       navigate('/');
-      window.location.reload();
+      window.location.reload(); 
       
     } catch (err) {
-      setError('Email sau parolă greșită!');
+      console.error(err);
+      setError('Email sau parolă greșită (sau cont inexistent).');
+    } finally {
+        setLoading(false);
     }
   };
 
@@ -36,7 +33,7 @@ const Login = () => {
     <Container className="d-flex justify-content-center align-items-center mt-5">
       <Card style={{ width: '400px' }} className="shadow">
         <Card.Body>
-          <h2 className="text-center text-primary mb-4">🍏 Autentificare</h2>
+          <h2 className="text-center text-success mb-4">🍏 Autentificare</h2>
           {error && <Alert variant="danger">{error}</Alert>}
           
           <Form onSubmit={handleSubmit}>
@@ -56,8 +53,8 @@ const Login = () => {
               />
             </Form.Group>
 
-            <Button variant="primary" type="submit" className="w-100">
-              Intră în aplicație
+            <Button variant="success" type="submit" className="w-100" disabled={loading}>
+               {loading ? <Spinner size="sm" animation="border"/> : 'Intră în aplicație'}
             </Button>
           </Form>
           <div className="mt-3 text-center">
