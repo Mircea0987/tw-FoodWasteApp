@@ -7,7 +7,8 @@ const Register = () => {
   const navigate = useNavigate();
   
   const [formData, setFormData] = useState({ 
-    name: '', 
+    firstName: '',
+    lastName: '',
     email: '', 
     password: '',
     confirmPassword: '' 
@@ -32,7 +33,8 @@ const Register = () => {
 
     try {
       const payload = {
-          name: formData.name,       
+          firstName: formData.firstName,
+          lastName: formData.lastName,       
           email: formData.email,     
           password: formData.password
       };
@@ -67,11 +69,20 @@ const Register = () => {
           
           <Form onSubmit={handleSubmit}>
             <Form.Group className="mb-3">
-              <Form.Label>Nume (Prenume)</Form.Label>
+              <Form.Label>Prenume</Form.Label>
               <Form.Control 
                 type="text" required 
                 placeholder="Ex: Ion"
-                onChange={(e) => setFormData({...formData, name: e.target.value})}
+                onChange={(e) => setFormData({...formData, firstName: e.target.value})}
+              />
+            </Form.Group>
+
+            <Form.Group className="mb-3">
+              <Form.Label>Nume de familie</Form.Label>
+              <Form.Control 
+                type="text" required 
+                placeholder="Ex: Popescu"
+                onChange={(e) => setFormData({...formData, lastName: e.target.value})}
               />
             </Form.Group>
 

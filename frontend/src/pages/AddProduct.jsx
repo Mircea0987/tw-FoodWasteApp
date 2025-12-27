@@ -3,6 +3,7 @@ import { Container, Form, Button, Card, Alert, Spinner } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { addProduct } from '../services/api'; 
 
+
 const AddProduct = () => {
   const navigate = useNavigate();
   
@@ -19,15 +20,24 @@ const AddProduct = () => {
     setLoading(true);
 
     
+    const myListId = localStorage.getItem("list_id");
+    
+    if(!myListId) {
+      alert("Eroare: Nu s-a găsit lista ta personală. Te rugăm să te autentifici din nou.");
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
+
     const productPayload = {
-      ProductName: name,         
-      ExpirationDate: date,      
+      ProductName: name,
+      ExpirationDate: date,
       
-      CategoryID: 1,             
-      ListID: 1,                 
-      
-      Status: 'private',         
-      Description: `Categorie selectată: ${category}` 
+      CategoryID: 1, // Salvam cu ID generic 1 pentru toate categoriile momentan
+      ListID: parseInt(myListId),
+      Status: 'private',
+      Description: category
     };
 
     try {

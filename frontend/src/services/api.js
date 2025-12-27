@@ -84,6 +84,23 @@ export const claimProduct = async (productId) => {
   }
 };
 
+// !!! Pentru backend : ar trebui sa aiba rutele DELETE
+// /api/product/products/:id si PUT /api/product/products/:id active.
+
+
+// Sterge produs
+
+export const deleteProduct = async (productId) => {
+  return await apiClient.delete(`/product/products/${productId}`);
+
+};
+
+// Actualizare produs
+
+export const updateProduct = async (productId, updateDate) => {
+  return await apiClient.put(`/product/products/${productId}`, updateDate);
+}
+
 // --- 4. AUTH ---
 
 export const loginUser = async (email, password) => {
@@ -110,10 +127,10 @@ export const loginUser = async (email, password) => {
 export const registerUser = async (userData) => {
   try {
     const payload = {
-        firstName: userData.name,    // auth.js cere "firstName"
-        lastName: "User",            // auth.js cere "lastName" (nu-l lasam gol/null ca sa fim siguri)
-        email: userData.email,       // auth.js cere "email"
-        password: userData.password  // auth.js cere "password"
+        firstName: userData.firstName,    
+        lastName: userData.lastName,            
+        email: userData.email,       
+        password: userData.password  
     };
 
     console.log("📤 Trimitem la server:", payload); // Debugging
