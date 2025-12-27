@@ -1,25 +1,57 @@
-
 import React, { useState } from 'react';
-import { Container, Form, Button, Card, Alert } from 'react-bootstrap';
+import { Container, Form, Button, Card, Alert, Spinner } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
 import { registerUser } from '../services/api'; 
 
 const Register = () => {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({ name: '', email: '', password: '' });
+  
+  const [formData, setFormData] = useState({ 
+    name: '', 
+    email: '', 
+    password: '',
+    confirmPassword: '' 
+  });
+  
+  // Stari pentru UI
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false); // <--- Stare noua pentru succes
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setShowSuccess(false);
+
+    if (formData.password !== formData.confirmPassword) {
+        setError('Parolele nu coincid!');
+        return;
+    }
+
+    setLoading(true);
 
     try {
-      // Trimitem datele la "server"
-      await registerUser(formData);
-      // Daca e ok, il trimitem la Login
-      navigate('/login');
+      const payload = {
+          name: formData.name,       
+          email: formData.email,     
+          password: formData.password
+      };
+
+      await registerUser(payload);
+
+      // 1. Afisam mesajul de succes
+      setLoading(false);
+      setShowSuccess(true);
+
+      // 2. Asteptam 2 secunde inainte sa schimbam pagina
+      setTimeout(() => {
+        navigate('/login');
+      }, 2000);
+
     } catch (err) {
-      setError('Eroare la înregistrare. Email-ul poate exista deja.');
+      console.error(err);
+      setLoading(false);
+      setError(err.message || 'Eroare la înregistrare.');
     }
   };
 
@@ -27,14 +59,18 @@ const Register = () => {
     <Container className="d-flex justify-content-center align-items-center mt-5">
       <Card style={{ width: '400px' }} className="shadow">
         <Card.Body>
-          <h2 className="text-center mb-4">Creează Cont</h2>
+          <h2 className="text-center mb-4 text-primary">Creează Cont</h2>
+          
+          {/* Mesaje de EROARE sau SUCCES */}
           {error && <Alert variant="danger">{error}</Alert>}
+          {showSuccess && <Alert variant="success">✅ Cont creat! Te redirecționăm...</Alert>}
           
           <Form onSubmit={handleSubmit}>
             <Form.Group className="mb-3">
-              <Form.Label>Nume</Form.Label>
+              <Form.Label>Nume (Prenume)</Form.Label>
               <Form.Control 
                 type="text" required 
+                placeholder="Ex: Ion"
                 onChange={(e) => setFormData({...formData, name: e.target.value})}
               />
             </Form.Group>
@@ -43,6 +79,7 @@ const Register = () => {
               <Form.Label>Email</Form.Label>
               <Form.Control 
                 type="email" required 
+                placeholder="email@exemplu.com"
                 onChange={(e) => setFormData({...formData, email: e.target.value})}
               />
             </Form.Group>
@@ -55,7 +92,17 @@ const Register = () => {
               />
             </Form.Group>
 
-            <Button className="w-100" type="submit">Înregistrează-te</Button>
+            <Form.Group className="mb-3">
+              <Form.Label>Confirmă Parola</Form.Label>
+              <Form.Control 
+                type="password" required 
+                onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
+              />
+            </Form.Group>
+
+            <Button className="w-100" type="submit" disabled={loading || showSuccess}>
+              {loading ? <Spinner size="sm" animation="border"/> : 'Înregistrează-te'}
+            </Button>
           </Form>
           <div className="mt-3 text-center">
             Ai deja cont? <Link to="/login">Intră în cont</Link>
