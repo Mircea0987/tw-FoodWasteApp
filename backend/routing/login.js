@@ -12,36 +12,49 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 const router = express.Router();
 
+router.post("", async (req, res) => {
+    try {
+        const user = await User.findOne({
+            where: {
+                Mail: req.body.email 
+            }
+        });
 
-router.post("",async(req,res)=>{
-
-    const user = await User.findOne({where:{
-        Mail: req.body.email
-    }});
-
-    if(!user){
-        return res.send(404).json({msg:"User not found!"});
-    }
-
-    const getHashPass = await bcrypt.compare(req.body.password,user.PasswordHash);
-
-    if(getHashPass){
-        
-        const payload = {
-            id: user.Id,
-            FirstName: user.firstName, 
-            LastName: user.lastName,    
-            Mail: user.email,   
+        if (!user) {
+            return res.status(404).json({ msg: "User not found!" });
         }
 
-        const token = jwtToker.sign(payload,process.env.JWT_PASS, {expiresIn :"1h"});
+       
+        const getHashPass = await bcrypt.compare(req.body.password, user.PasswordHash);
 
-        return res.status(200).json({msg:"Succes",token:token});
-    }else{
-        return res.status(404).json({msg:"Error!"});
+        if (getHashPass) {
+            
+            // [MODIFICARE COSTIN]: Am extras datele userului pentru a le trimite inapoi.
+            const userData = {
+                id: user.UserID,
+                FirstName: user.FirstName,
+                LastName: user.LastName,
+                Mail: user.Mail
+            };
+
+            const token = jwtToker.sign(userData, process.env.JWT_PASS, { expiresIn: "1h" });
+
+            // [MODIFICARE COSTIN]: Trimitem si obiectul 'user' pe langa token.
+            // Motiv: Frontend-ul are nevoie de 'FirstName' ca sa afiseze "Salut, Nume" in Navbar.
+            // Inainte se trimitea doar token-ul si nu puteam extrage numele.
+            return res.status(200).json({
+                msg: "Succes",
+                token: token,
+                user: userData  // Frontend-ul va citi asta
+            });
+
+        } else {
+            return res.status(401).json({ msg: "Parola incorecta!" });
+        }
+    } catch (err) {
+        console.error("Login Error:", err);
+        return res.status(500).json({ msg: "Server error" });
     }
-
 })
-
 
 module.exports = router;
