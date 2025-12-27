@@ -34,7 +34,8 @@ User.belongsToMany(Tag, { through: "UserTag" });
 Tag.belongsToMany(User, { through: "UserTag" });
 
 //1-M between Category and Products
-
+//localhost/api/categoryID/product for post
+//localhost/api/categoryId/productID delete put in categoty one product
 Category.hasMany(Product);
 Product.belongsTo(Category);
 
