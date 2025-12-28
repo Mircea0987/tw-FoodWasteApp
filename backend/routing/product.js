@@ -9,7 +9,7 @@ const { authenticateToken } = require("../middleware/auth");
 
 router.get("/products", authenticateToken, async (req, res) => {
   try {
-    const fridge = await ProductList.findOne({ where: { UserID: req.user.id, Status: "private" } });
+    const fridge = await ProductList.findOne({ where: { UserID: req.user.id} });
     if (!fridge) return res.status(400).json({ message: "Nu ai frigider." });
 
     const products = await Product.findAll({ where: { Status: "private" } });
