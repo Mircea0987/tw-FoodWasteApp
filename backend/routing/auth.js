@@ -30,6 +30,9 @@ router.post("/", async (req, res) => {
       UserID: newUser.UserID
     });
 
+    newUser.ListID = newFridge.ListID; 
+    await newUser.save();
+
     res.status(201).json({ message: "Cont creat și frigider alocat!" });
 
   } catch (err) {

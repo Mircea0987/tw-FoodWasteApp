@@ -34,7 +34,8 @@ router.post("", async (req, res) => {
                 id: user.UserID,
                 FirstName: user.FirstName,
                 LastName: user.LastName,
-                Mail: user.Mail
+                Mail: user.Mail,
+                ListID: user.ListID
             };
 
             const token = jwtToker.sign(userData, process.env.JWT_PASS, { expiresIn: "1h" });
