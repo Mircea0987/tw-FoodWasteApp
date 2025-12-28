@@ -25,7 +25,7 @@ router.post("/", async (req, res) => {
       AvatarPhoto: null
     });
 
-    await ProductList.create({
+    const newFridge = await ProductList.create({
       ListName: `Frigider - ${newUser.FirstName}`,
       UserID: newUser.UserID
     });
