@@ -5,6 +5,7 @@ const bcrypt = require("bcryptjs");
 const jwtToker = require("jsonwebtoken");
 
 const User = require('../models/User');
+const ProductList = require("../models/ProductList");
 
 app.use(express.json());
 app.use(bodyParser.json());
@@ -24,7 +25,6 @@ router.post("", async (req, res) => {
             return res.status(404).json({ msg: "User not found!" });
         }
 
-       
         const getHashPass = await bcrypt.compare(req.body.password, user.PasswordHash);
 
         if (getHashPass) {
