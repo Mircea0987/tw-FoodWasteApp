@@ -5,7 +5,6 @@ const bcrypt = require("bcryptjs");
 const jwtToker = require("jsonwebtoken");
 
 const User = require('../models/User');
-const ProductList = require("../models/ProductList");
 
 app.use(express.json());
 app.use(bodyParser.json());
@@ -35,7 +34,7 @@ router.post("", async (req, res) => {
                 FirstName: user.FirstName,
                 LastName: user.LastName,
                 Mail: user.Mail,
-                ListID: user.ListID //[MODIFICARE MIRCEA]: Am adaugat in JWT si ListaID pentru frontend
+                ListID: user.ListID
             };
 
             const token = jwtToker.sign(userData, process.env.JWT_PASS, { expiresIn: "1h" });

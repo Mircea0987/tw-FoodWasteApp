@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Configurare de bază
-const API_BASE_URL = 'http://localhost:8001/api';
+const API_BASE_URL = 'http://13.61.26.210:8001';
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -23,7 +23,7 @@ apiClient.interceptors.request.use((config) => {
 
 export const getMyFridge = async () => {
   try {
-    const response = await apiClient.get('/product/products');
+    const response = await apiClient.get('/api/product/products');
     return { data: response.data }; 
   } catch (error) {
     if (error.response && error.response.status === 404) {
@@ -36,7 +36,7 @@ export const getMyFridge = async () => {
 
 export const getMarketplaceItems = async () => {
   try {
-    const response = await apiClient.get('/product/marketplace');
+    const response = await apiClient.get('/api/product/marketplace');
     return { data: response.data };
   } catch (error) {
     if (error.response && error.response.status === 404) {
@@ -52,7 +52,7 @@ export const getMarketplaceItems = async () => {
 export const addProduct = async (productData) => {
   try {
     const payload = { ...productData, Status: 'private' };
-    const response = await apiClient.post('/product/products', payload);
+    const response = await apiClient.post('/api/product/products', payload);
     return { data: response.data.product || response.data }; 
   } catch (error) {
     console.error("Eroare la addProduct:", error);
@@ -63,32 +63,32 @@ export const addProduct = async (productData) => {
 // --- 3. ACTIUNI (SHARE & CLAIM)
 
 export const shareProduct = async (id) => {
-  return await apiClient.put(`/product/products/share/${id}`);
+  return await apiClient.put(`/api/product/products/share/${id}`);
 };
 
 export const claimProduct = async (id) => {
-  return await apiClient.put(`/product/products/claim/${id}`);
+  return await apiClient.put(`/api/product/products/claim/${id}`);
 };
 
 
 // Sterge produs
 
 export const deleteProduct = async (productId) => {
-  return await apiClient.delete(`/product/products/${productId}`);
+  return await apiClient.delete(`/api/product/products/${productId}`);
 
 };
 
 // Actualizare produs
 
 export const updateProduct = async (id, productData) => {
-  return await apiClient.put(`/product/products/${id}`, productData);
+  return await apiClient.put(`/api/product/products/${id}`, productData);
 }
 
 // --- 4. AUTH ---
 
 export const loginUser = async (email, password) => {
   try {
-    const response = await apiClient.post('/login', { 
+    const response = await apiClient.post('api/login', { 
         email: email, 
         password: password 
     });
@@ -118,7 +118,7 @@ export const registerUser = async (userData) => {
 
     console.log("📤 Trimitem la server:", payload); // Debugging
 
-    const response = await apiClient.post('/register', payload);
+    const response = await apiClient.post('api/register', payload);
     return { success: true, data: response.data };
   } catch (error) {
     console.error("Eroare la register:", error);
