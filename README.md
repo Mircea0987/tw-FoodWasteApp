@@ -1,6 +1,10 @@
 # tw-FoodWasteApp
 Web Technology Project
 
+## Deployment
+
+https://mircea0987.github.io/tw-FoodWasteApp/
+
 ## 📅 Specificații detaliate, planul de proiect
 - Prezența unui proiect în Git: **16.11.2025**
 - Obiectiv: realizarea unei aplicații web de tip **SPA** cu front-end React.js și back-end Node.js/Express, conectată la o bază de date PostgreSQL.
