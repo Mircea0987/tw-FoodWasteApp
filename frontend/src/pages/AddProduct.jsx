@@ -97,9 +97,7 @@ const AddProduct = () => {
                 <option>Conserve</option>
                 <option>Altele</option>
               </Form.Select>
-              <Form.Text className="text-muted">
-                *Momentan se va salva intern cu ID-ul generic 1.
-              </Form.Text>
+              
             </Form.Group>
 
             {/* DATA EXPIRARII */}

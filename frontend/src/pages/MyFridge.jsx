@@ -28,15 +28,8 @@ const MyFridge = () => {
       const response = await getMyFridge();
       const rawData = Array.isArray(response.data) ? response.data : [];
 
-      const myListId = localStorage.getItem("list_id");
-      const myIdInt = myListId ? parseInt(myListId) : 1; 
+      setProducts(rawData);
 
-      if (myIdInt) {
-        const myProducts = rawData.filter(p => p.ListID === myIdInt);
-        setProducts(myProducts);
-      } else {
-        setProducts([]);
-      }
     } catch (err) {
       console.error("Eroare incarcare frigider:", err);
       setError("Nu am putut încărca datele.");
@@ -103,7 +96,7 @@ const MyFridge = () => {
             ExpirationDate: editData.date,
             CategoryID: 1, 
             ListID: editData.listID,
-            Status: 'FRIDGE', 
+            Status: 'private', 
             Description: `Categorie selectată: ${editData.category}` 
         };
 

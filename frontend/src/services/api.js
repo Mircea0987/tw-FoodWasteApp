@@ -36,7 +36,7 @@ export const getMyFridge = async () => {
 
 export const getMarketplaceItems = async () => {
   try {
-    const response = await apiClient.get('/product/products');
+    const response = await apiClient.get('/product/marketplace');
     return { data: response.data };
   } catch (error) {
     if (error.response && error.response.status === 404) {
@@ -63,11 +63,11 @@ export const addProduct = async (productData) => {
 // --- 3. ACTIUNI (SHARE & CLAIM)
 
 export const shareProduct = async (id) => {
-  return await apiClient.put(`/product/share/${id}`);
+  return await apiClient.put(`/product/products/share/${id}`);
 };
 
 export const claimProduct = async (id) => {
-  return await apiClient.put(`/product/claim/${id}`);
+  return await apiClient.put(`/product/products/claim/${id}`);
 };
 
 

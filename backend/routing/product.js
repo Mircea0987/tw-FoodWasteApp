@@ -13,7 +13,9 @@ router.get("/products", authenticateToken, async (req, res) => {
     const fridge = await ProductList.findOne({ where: { UserID: user.id} });
     if (!fridge) return res.status(400).json({ message: "Nu ai frigider." });
 
-    const products = await Product.findAll({ where: { Status: "private"}});
+    const products = await Product.findAll({ where: {
+      ListID: fridge.ListID,
+      Status: "private"}});
     console.log(products);
     
     res.status(200).json(products);
@@ -109,7 +111,7 @@ router.put("/products/share/:id", authenticateToken, async (req, res) => {
     if (product.Status === "public") return res.status(400).json({ message: "Produsul este deja în Marketplace." });
 
     product.Status = "public";
-    product.ListID = null; //produsul este public => nu mai apartine nimanui
+    //product.ListID = null; //produsul este public => nu mai apartine nimanui
     await product.save();
 
     res.json({ message: "Produsul a fost mutat în Marketplace.", product });

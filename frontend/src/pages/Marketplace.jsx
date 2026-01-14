@@ -26,7 +26,7 @@ const Marketplace = () => {
       const response = await getMarketplaceItems();
       const rawData = Array.isArray(response.data) ? response.data : [];
 
-      const publicItems = rawData.filter(item => item.Status === 'MARKETPLACE' || item.Status === 'public');
+      const publicItems = rawData.filter(item => item.Status === 'public');
 
       const adaptedItems = publicItems.map(dbItem => {
         let cleanCategory = dbItem.Description || 'Altele';
@@ -39,7 +39,7 @@ const Marketplace = () => {
             name: dbItem.ProductName,       
             expirationDate: dbItem.ExpirationDate, 
             category: cleanCategory,        
-            // Va scrie "Vecinul Tau" pana cand primestem numele real din backend
+            
             owner: 'Vecinul Tău',           
             image: `https://placehold.co/100?text=${dbItem.ProductName ? dbItem.ProductName.substring(0,3) : 'H'}` 
         };
