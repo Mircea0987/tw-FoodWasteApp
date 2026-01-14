@@ -3,7 +3,7 @@ Web Technology Project
 
 ## Deployment
 
-https://mircea0987.github.io/tw-FoodWasteApp/
+(http://tw-foodwasteasteapp.s3-website.eu-north-1.amazonaws.com/)
 
 ## 📅 Specificații detaliate, planul de proiect
 - Prezența unui proiect în Git: **16.11.2025**
