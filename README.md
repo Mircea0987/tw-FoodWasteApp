@@ -3,7 +3,7 @@ Web Technology Project
 
 ## Deployment
 
-(http://tw-foodwasteasteapp.s3-website.eu-north-1.amazonaws.com/)
+(http://tw-foodwasteasteapp.s3-website.eu-north-1.amazonaws.com/) !!! Asigurati-va ca in URL este HTTP
 
 ## 📅 Specificații detaliate, planul de proiect
 - Prezența unui proiect în Git: **16.11.2025**
