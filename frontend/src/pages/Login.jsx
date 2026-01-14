@@ -19,6 +19,7 @@ const Login = () => {
       await loginUser(email, password);
       
       navigate('/');
+      window.location.reload(); 
       
     } catch (err) {
       console.error(err);
